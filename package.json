@@ -4,7 +4,7 @@
   "description": "Servicio profesional y anónimo de acortador de URLs",
   "main": "server.js",
   "engines": {
-    "node": ">=18.0.0"
+    "node": "20.x"
   },
   "scripts": {
     "start": "node server.js",
@@ -15,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
-    "better-sqlite3": "^9.2.2",
+    "better-sqlite3": "^11.0.0",
     "validator": "^13.11.0",
     "nanoid": "^3.3.7"
   },
