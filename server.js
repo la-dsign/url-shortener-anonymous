@@ -15,32 +15,49 @@ const BASE_URL = process.env.BASE_URL || process.env.RAILWAY_PUBLIC_DOMAIN
 const JWT_SECRET = process.env.JWT_SECRET || 'tu-secreto-super-seguro-cambialo-en-produccion';
 
 // Base de datos SQLite
-const db = new Database('urls.db');
+// En producción (Render), usar /opt/render/project/src para persistencia
+const dbPath = process.env.NODE_ENV === 'production' 
+  ? path.join(__dirname, 'urls.db')
+  : 'urls.db';
 
-// Crear tablas si no existen
-db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )
-`);
+console.log('📁 Database path:', dbPath);
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS urls (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    short_code TEXT UNIQUE NOT NULL,
-    original_url TEXT NOT NULL,
-    user_id INTEGER,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    expires_at DATETIME,
-    clicks INTEGER DEFAULT 0,
-    is_active INTEGER DEFAULT 1,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-  )
-`);
+let db;
+try {
+  db = new Database(dbPath);
+  console.log('✅ Database connection successful');
+  
+  // Crear tablas si no existen
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS urls (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      short_code TEXT UNIQUE NOT NULL,
+      original_url TEXT NOT NULL,
+      user_id INTEGER,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      expires_at DATETIME,
+      clicks INTEGER DEFAULT 0,
+      is_active INTEGER DEFAULT 1,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
+  
+  console.log('✅ Database tables initialized');
+} catch (error) {
+  console.error('❌ Database initialization error:', error.message);
+  console.error('Current directory:', __dirname);
+  process.exit(1);
+}
 
 // Middleware
 app.use(express.json());
