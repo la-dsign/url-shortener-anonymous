@@ -6,130 +6,197 @@
     <title>Mi Panel - ShortLink</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        .dashboard-header {
+        body {
+            background: #f5f5f7;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        .top-bar {
+            background: white;
+            border-radius: 16px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .user-info {
+        .user-section {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
         }
 
-        .user-avatar {
-            width: 50px;
-            height: 50px;
+        .avatar {
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
-            background: var(--primary);
-            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            color: white;
+            font-size: 24px;
             font-weight: 700;
         }
 
-        .user-details h2 {
+        .user-info h2 {
             margin: 0;
-            font-size: 1.2rem;
-            color: var(--text-dark);
+            font-size: 1.3rem;
+            color: #1a1a1a;
         }
 
-        .user-details p {
-            margin: 0;
-            font-size: 0.9rem;
-            color: var(--text-light);
+        .user-info p {
+            margin: 4px 0 0 0;
+            font-size: 0.95rem;
+            color: #666;
         }
 
-        .logout-btn {
-            padding: 10px 20px;
-            background: #ef4444;
-            color: white;
+        .top-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .logout-btn:hover {
-            background: #dc2626;
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #666;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            border-color: #667eea;
+            color: #667eea;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
-        .stat-box {
+        .stat-card {
             background: white;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
         }
 
-        .stat-box h3 {
-            margin: 0 0 8px 0;
-            font-size: 0.9rem;
-            color: var(--text-light);
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #666;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 12px;
         }
 
-        .stat-box .value {
-            font-size: 2rem;
+        .stat-value {
+            font-size: 2.5rem;
             font-weight: 700;
-            color: var(--primary);
+            color: #1a1a1a;
+            margin-bottom: 8px;
         }
 
-        .urls-list {
+        .stat-trend {
+            font-size: 0.9rem;
+            color: #10b981;
+        }
+
+        .main-panel {
             background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: var(--shadow);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .urls-list h2 {
-            margin: 0 0 20px 0;
-            color: var(--text-dark);
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
         }
 
-        .url-item {
-            padding: 20px;
-            background: var(--bg-light);
+        .panel-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #1a1a1a;
+        }
+
+        .search-box {
+            padding: 10px 16px;
+            border: 2px solid #e0e0e0;
             border-radius: 10px;
-            margin-bottom: 16px;
+            width: 280px;
+            font-size: 0.95rem;
             transition: all 0.2s;
-            position: relative;
         }
 
-        .url-item:hover {
-            transform: translateX(4px);
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
         }
 
-        .url-item.expired {
-            opacity: 0.6;
-            background: #fee;
+        .url-card {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            border: 2px solid transparent;
+            transition: all 0.2s;
         }
 
-        .url-header {
+        .url-card:hover {
+            border-color: #667eea;
+            background: white;
+        }
+
+        .url-card.inactive {
+            opacity: 0.5;
+            border-color: #ef4444;
+        }
+
+        .url-main {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 12px;
-            gap: 16px;
+            margin-bottom: 16px;
         }
 
-        .url-info {
+        .url-details {
             flex: 1;
             min-width: 0;
         }
@@ -137,53 +204,90 @@
         .url-short {
             font-size: 1.1rem;
             font-weight: 700;
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
+            color: #667eea;
+            margin-bottom: 8px;
             word-break: break-all;
         }
 
-        .url-clicks {
-            background: var(--primary);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
+        .url-original {
+            color: #666;
             font-size: 0.9rem;
+            word-break: break-all;
+            margin-bottom: 8px;
+        }
+
+        .url-meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .url-stats {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .click-badge {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
             font-weight: 600;
-            white-space: nowrap;
+        }
+
+        .badge-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-expiring {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-expired {
+            background: #fee2e2;
+            color: #991b1b;
         }
 
         .url-actions {
             display: flex;
             gap: 8px;
-            margin-top: 12px;
+            padding-top: 16px;
+            border-top: 1px solid #e0e0e0;
         }
 
         .action-btn {
-            padding: 6px 12px;
+            padding: 8px 16px;
+            border-radius: 8px;
             border: none;
-            border-radius: 6px;
-            font-size: 0.85rem;
             font-weight: 600;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .btn-delete {
-            background: #ef4444;
+        .btn-copy {
+            background: #667eea;
             color: white;
         }
 
-        .btn-delete:hover {
-            background: #dc2626;
-        }
-
-        .btn-copy-url {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-copy-url:hover {
-            background: var(--primary-dark);
+        .btn-copy:hover {
+            background: #5568d3;
         }
 
         .btn-expire {
@@ -195,75 +299,91 @@
             background: #d97706;
         }
 
-        .expire-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            background: #fef3c7;
-            color: #92400e;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-top: 8px;
+        .btn-delete {
+            background: #ef4444;
+            color: white;
         }
 
-        .expire-badge.expired {
-            background: #fee2e2;
-            color: #991b1b;
+        .btn-delete:hover {
+            background: #dc2626;
         }
 
-        .modal {
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            color: #999;
+            margin-bottom: 24px;
+        }
+
+        .modal-overlay {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             z-index: 1000;
             align-items: center;
             justify-content: center;
         }
 
-        .modal.active {
-
-        <!-- Modal de expiración -->
-        <div id="expireModal" class="modal">
-            <div class="modal-content">
-                <h3>Programar Expiración</h3>
-                <select id="modalExpiresIn">
-                    <option value="never">Nunca expira</option>
-                    <option value="1h">1 hora desde ahora</option>
-                    <option value="24h">24 horas desde ahora</option>
-                    <option value="7d">7 días desde ahora</option>
-                    <option value="30d">30 días desde ahora</option>
-                </select>
-                <div class="modal-actions">
-                    <button onclick="closeExpireModal()" style="background: var(--border); color: var(--text-dark);">Cancelar</button>
-                    <button onclick="updateExpiration()" style="background: var(--primary); color: white;">Guardar</button>
-                </div>
-            </div>
-        </div>
+        .modal-overlay.active {
             display: flex;
         }
 
-        .modal-content {
+        .modal-box {
             background: white;
-            padding: 30px;
-            border-radius: 16px;
-            max-width: 400px;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 480px;
             width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
-        .modal-content h3 {
-            margin: 0 0 20px 0;
+        .modal-box h3 {
+            margin: 0 0 24px 0;
+            font-size: 1.5rem;
+            color: #1a1a1a;
         }
 
-        .modal-content select {
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group select {
             width: 100%;
-            padding: 12px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            margin-bottom: 20px;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
         }
 
         .modal-actions {
@@ -273,93 +393,102 @@
 
         .modal-actions button {
             flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
-        }
-
-        .url-original {
-            color: var(--text-light);
-            font-size: 0.9rem;
-            word-break: break-all;
-            margin-bottom: 8px;
-        }
-
-        .url-date {
-            font-size: 0.85rem;
-            color: var(--text-light);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-light);
-        }
-
-        .empty-state-icon {
-            font-size: 4rem;
-            margin-bottom: 16px;
-        }
-
-        .create-link-btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 24px;
-            background: var(--primary);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
             transition: all 0.2s;
         }
 
-        .create-link-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
+        @media (max-width: 768px) {
+            .top-bar {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .url-main {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .url-actions {
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="dashboard-header">
-            <div class="user-info">
-                <div class="user-avatar" id="userAvatar">U</div>
-                <div class="user-details">
+        <div class="top-bar">
+            <div class="user-section">
+                <div class="avatar" id="userAvatar">U</div>
+                <div class="user-info">
                     <h2 id="username">Cargando...</h2>
                     <p id="userEmail">usuario@email.com</p>
                 </div>
             </div>
-            <button class="logout-btn" id="logoutBtn">Cerrar Sesión</button>
+            <div class="top-actions">
+                <a href="/" class="btn btn-secondary">🏠 Inicio</a>
+                <button class="btn btn-secondary" id="logoutBtn">🚪 Salir</button>
+            </div>
         </div>
 
         <div class="stats-grid">
-            <div class="stat-box">
-                <h3>Total de Enlaces</h3>
-                <div class="value" id="totalUrls">0</div>
+            <div class="stat-card">
+                <div class="stat-label">Total Enlaces</div>
+                <div class="stat-value" id="totalUrls">0</div>
+                <div class="stat-trend">● Activos</div>
             </div>
-        let currentShortCode = null;
-            <div class="stat-box">
-                <h3>Total de Clics</h3>
-                <div class="value" id="totalClicks">0</div>
+            <div class="stat-card">
+                <div class="stat-label">Total Clics</div>
+                <div class="stat-value" id="totalClicks">0</div>
+                <div class="stat-trend">● Todas las URLs</div>
             </div>
-            <div class="stat-box">
-                <h3>Más Popular</h3>
-                <div class="value" style="font-size: 1.5rem;" id="mostPopular">-</div>
+            <div class="stat-card">
+                <div class="stat-label">Más Popular</div>
+                <div class="stat-value" id="mostPopular" style="font-size: 1.8rem;">-</div>
+                <div class="stat-trend">● Mayor tráfico</div>
             </div>
         </div>
 
-        <div class="urls-list">
-            <h2>Mis Enlaces Acortados</h2>
+        <div class="main-panel">
+            <div class="panel-header">
+                <h2>📊 Mis Enlaces</h2>
+                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Buscar enlaces...">
+            </div>
             <div id="urlsList"></div>
+        </div>
+
+        <div id="expireModal" class="modal-overlay">
+            <div class="modal-box">
+                <h3>⏱️ Programar Expiración</h3>
+                <div class="form-group">
+                    <label>Selecciona cuándo expirará este enlace:</label>
+                    <select id="modalExpiresIn">
+                        <option value="never">♾️ Nunca expira</option>
+                        <option value="1h">🕐 1 hora desde ahora</option>
+                        <option value="24h">📅 24 horas desde ahora</option>
+                        <option value="7d">📆 7 días desde ahora</option>
+                        <option value="30d">🗓️ 30 días desde ahora</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button onclick="closeExpireModal()" class="btn btn-secondary" style="border: none;">Cancelar</button>
+                    <button onclick="updateExpiration()" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         let userData = null;
+        let currentShortCode = null;
+        let allUrls = [];
 
-        // Verificar autenticación
         async function checkAuth() {
             try {
                 const response = await fetch('/api/auth/me');
@@ -388,72 +517,103 @@
                 if (!response.ok) throw new Error('Error al cargar URLs');
                 
                 const data = await response.json();
-                const urls = data.urls;
+                allUrls = data.urls;
 
-                if (urls.length === 0) {
+                if (allUrls.length === 0) {
                     document.getElementById('urlsList').innerHTML = `
                         <div class="empty-state">
-                            <div class="empty-state-icon">🔗</div>
-                            <h3>No tienes enlaces acortados aún</h3>
+                            <div class="empty-icon">🔗</div>
+                            <h3>No tienes enlaces acortados</h3>
                             <p>Crea tu primer enlace para empezar a rastrear estadísticas</p>
-                            <a href="/" class="create-link-btn">Crear Primer Enlace</a>
+                            <a href="/" class="btn btn-primary">✨ Crear Primer Enlace</a>
                         </div>
                     `;
+                    updateStats([], 0, 0, '-');
                     return;
                 }
 
-                // Calcular estadísticas
-                const totalUrls = urls.length;
-                const totalClicks = urls.reduce((sum, url) => sum + url.clicks, 0);
-                const mostPopular = urls.reduce((max, url) => url.clicks > max.clicks ? url : max, urls[0]);
+                displayUrls(allUrls);
+                
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
 
-                document.getElementById('totalUrls').textContent = totalUrls;
-                document.getElementById('totalClicks').textContent = totalClicks.toLocaleString();
-                document.getElementById('mostPopular').textContent = mostPopular.clicks + ' clics';
+        function displayUrls(urls) {
+            const activeUrls = urls.filter(u => u.is_active);
+            const totalClicks = urls.reduce((sum, url) => sum + url.clicks, 0);
+            const mostPopular = activeUrls.length > 0 ? activeUrls.reduce((max, url) => url.clicks > max.clicks ? url : max, activeUrls[0]) : null;
+            
+            updateStats(activeUrls, totalClicks, activeUrls.length, mostPopular ? `${mostPopular.clicks} clics` : '-');
 
-                // Mostrar URLs
-                const urlsHtml = urls.map(url => {
-                    const date = new Date(url.created_at);
-                    const shortUrl = window.location.origin + '/' + url.short_code;
-                    const now = new Date();
-                    const isExpired = url.expires_at && new Date(url.expires_at) < now;
-                    const isInactive = !url.is_active;
-                    
-                    let expireBadge = '';
-                    if (isInactive) {
-                        expireBadge = '<span class="expire-badge expired">🗑️ Eliminado</span>';
-                    } else if (isExpired) {
-                        expireBadge = '<span class="expire-badge expired">⏰ Expirado</span>';
-                    } else if (url.expires_at) {
-                        const expiresDate = new Date(url.expires_at);
-                        const timeLeft = Math.ceil((expiresDate - now) / (1000 * 60 * 60));
-                        if (timeLeft < 24) {
-                            expireBadge = `<span class="expire-badge">⏰ Expira en ${timeLeft}h</span>`;
-                        } else {
-                            const daysLeft = Math.ceil(timeLeft / 24);
-                            expireBadge = `<span class="expire-badge">⏰ Expira en ${daysLeft}d</span>`;
-                        }
+            const urlsHtml = urls.map(url => {
+                const date = new Date(url.created_at);
+                const shortUrl = window.location.origin + '/' + url.short_code;
+                
+                const now = new Date();
+                const isExpired = url.expires_at && new Date(url.expires_at) < now;
+                const isInactive = !url.is_active;
+                
+                let statusBadge = '';
+                
+                if (isInactive) {
+                    statusBadge = '<span class="status-badge badge-expired">🗑️ Eliminado</span>';
+                } else if (isExpired) {
+                    statusBadge = '<span class="status-badge badge-expired">⏰ Expirado</span>';
+                } else if (url.expires_at) {
+                    const expiresDate = new Date(url.expires_at);
+                    const hoursLeft = Math.ceil((expiresDate - now) / (1000 * 60 * 60));
+                    if (hoursLeft < 24) {
+                        statusBadge = `<span class="status-badge badge-expiring">⏰ ${hoursLeft}h restantes</span>`;
+                    } else {
+                        const daysLeft = Math.ceil(hoursLeft / 24);
+                        statusBadge = `<span class="status-badge badge-active">⏰ ${daysLeft}d restantes</span>`;
                     }
-                    
-                    return `
-                        <div class="url-item ${isExpired || isInactive ? 'expired' : ''}">
-                            <div class="url-header">
-                                <div class="url-info">
-                                    <div class="url-short">${shortUrl}</div>
-                                    <div class="url-original">${url.original_url}</div>
-                                    <div class="url-date">Creado: ${date.toLocaleDateString('es-ES', { 
-                                        year: 'numeric', 
-                                        month: 'long', 
-                                        day: 'numeric' 
-                                    })}</div>
-                                    ${expireBadge}
+                } else {
+                    statusBadge = '<span class="status-badge badge-active">✓ Activo</span>';
+                }
+                
+                return `
+                    <div class="url-card ${isInactive || isExpired ? 'inactive' : ''}">
+                        <div class="url-main">
+                            <div class="url-details">
+                                <div class="url-short">${url.short_code}</div>
+                                <div class="url-original">🔗 ${url.original_url}</div>
+                                <div class="url-meta">
+                                    <span>📅 ${date.toLocaleDateString('es-ES')}</span>
+                                    ${statusBadge}
                                 </div>
-                                <div class="url-clicks">${url.clicks} clics</div>
                             </div>
-                            <div class="url-actions">
-                                <button class="action-btn btn-copy-url" onclick="copyUrl('${shortUrl}')">
-                                    📋 Copiar
-           Copiar URL
+                            <div class="url-stats">
+                                <div class="click-badge">👆 ${url.clicks} clics</div>
+                            </div>
+                        </div>
+                        <div class="url-actions">
+                            <button class="action-btn btn-copy" onclick="copyUrl('${shortUrl}')">
+                                📋 Copiar
+                            </button>
+                            ${!isInactive ? `
+                                <button class="action-btn btn-expire" onclick="openExpireModal('${url.short_code}')">
+                                    ⏱️ Expiración
+                                </button>
+                                <button class="action-btn btn-delete" onclick="deleteUrl('${url.short_code}')">
+                                    🗑️ Eliminar
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('urlsList').innerHTML = urlsHtml;
+        }
+
+        function updateStats(activeUrls, totalClicks, totalUrls, mostPopular) {
+            document.getElementById('totalUrls').textContent = totalUrls;
+            document.getElementById('totalClicks').textContent = totalClicks.toLocaleString();
+            document.getElementById('mostPopular').textContent = mostPopular;
+        }
+
         async function copyUrl(url) {
             try {
                 await navigator.clipboard.writeText(url);
@@ -463,41 +623,32 @@
             }
         }
 
-        // Eliminar URL
         async function deleteUrl(shortCode) {
-            if (!confirm('¿Estás seguro de que quieres eliminar este enlace?')) {
+            if (!confirm('¿Eliminar este enlace? Esta acción no se puede deshacer.')) {
                 return;
             }
 
             try {
-                const response = await fetch(`/api/urls/${shortCode}`, {
-                    method: 'DELETE'
-                });
-
-                if (!response.ok) {
-                    throw new Error('Error al eliminar');
-                }
-
+                const response = await fetch(`/api/urls/${shortCode}`, { method: 'DELETE' });
+                if (!response.ok) throw new Error('Error al eliminar');
+                
                 alert('✓ Enlace eliminado exitosamente');
                 loadUrls();
             } catch (error) {
-                alert('Error al eliminar el enlace');
+                alert('❌ Error al eliminar el enlace');
             }
         }
 
-        // Abrir modal de expiración
         function openExpireModal(shortCode) {
             currentShortCode = shortCode;
             document.getElementById('expireModal').classList.add('active');
         }
 
-        // Cerrar modal
         function closeExpireModal() {
             currentShortCode = null;
             document.getElementById('expireModal').classList.remove('active');
         }
 
-        // Actualizar expiración
         async function updateExpiration() {
             const expiresIn = document.getElementById('modalExpiresIn').value;
 
@@ -508,52 +659,16 @@
                     body: JSON.stringify({ expiresIn })
                 });
 
-                if (!response.ok) {
-                    throw new Error('Error al actualizar');
-                }
+                if (!response.ok) throw new Error('Error al actualizar');
 
                 alert('✓ Expiración actualizada exitosamente');
                 closeExpireModal();
                 loadUrls();
             } catch (error) {
-                alert('Error al actualizar la expiración');
+                alert('❌ Error al actualizar la expiración');
             }
         }
 
-        // Cerrar modal al hacer clic fuera
-        document.getElementById('expireModal').addEventListener('click', (e) => {
-            if (e.target.id === 'expireModal') {
-                closeExpireModal();
-            }
-        });
-
-        //                      </button>
-                                ${!isInactive ? `
-                                    <button class="action-btn btn-expire" onclick="openExpireModal('${url.short_code}')">
-                                        ⏱️ Expiración
-                                    </button>
-                                    <button class="action-btn btn-delete" onclick="deleteUrl('${url.short_code}')">
-                                        🗑️ Eliminar
-                                    </button>
-                                ` : ''}
-                             day: 'numeric' 
-                            })}</div>
-                        </div>
-                    `;
-                }).join('');
-
-                document.getElementById('urlsList').innerHTML = urlsHtml;
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('urlsList').innerHTML = `
-                    <div class="empty-state">
-                        <p>Error al cargar los enlaces</p>
-                    </div>
-                `;
-            }
-        }
-
-        // Logout
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             try {
                 await fetch('/api/auth/logout', { method: 'POST' });
@@ -563,7 +678,19 @@
             }
         });
 
-        // Inicializar
+        document.getElementById('expireModal').addEventListener('click', (e) => {
+            if (e.target.id === 'expireModal') closeExpireModal();
+        });
+
+        document.getElementById('searchBox').addEventListener('input', (e) => {
+            const search = e.target.value.toLowerCase();
+            const filtered = allUrls.filter(url => 
+                url.original_url.toLowerCase().includes(search) || 
+                url.short_code.toLowerCase().includes(search)
+            );
+            displayUrls(filtered);
+        });
+
         checkAuth();
     </script>
 </body>
