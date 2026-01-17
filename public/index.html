@@ -46,6 +46,19 @@
                     </button>
                 </div>
 
+                <div id="expirationOptions" style="display: none; margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; color: var(--text-dark); font-weight: 600;">
+                        ⏱️ Tiempo de expiración (opcional)
+                    </label>
+                    <select id="expiresIn" style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 14px;">
+                        <option value="">Nunca expira</option>
+                        <option value="1h">1 hora</option>
+                        <option value="24h">24 horas</option>
+                        <option value="7d">7 días</option>
+                        <option value="30d">30 días</option>
+                    </select>
+                </div>
+
                 <div id="error" class="error-message" style="display: none;"></div>
 
                 <div id="result" class="result" style="display: none;">

@@ -109,10 +109,16 @@
             border-radius: 10px;
             margin-bottom: 16px;
             transition: all 0.2s;
+            position: relative;
         }
 
         .url-item:hover {
             transform: translateX(4px);
+        }
+
+        .url-item.expired {
+            opacity: 0.6;
+            background: #fee;
         }
 
         .url-header {
@@ -120,6 +126,12 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 12px;
+            gap: 16px;
+        }
+
+        .url-info {
+            flex: 1;
+            min-width: 0;
         }
 
         .url-short {
@@ -138,6 +150,134 @@
             font-size: 0.9rem;
             font-weight: 600;
             white-space: nowrap;
+        }
+
+        .url-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        .btn-copy-url {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-copy-url:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-expire {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-expire:hover {
+            background: #d97706;
+        }
+
+        .expire-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .expire-badge.expired {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+
+        <!-- Modal de expiración -->
+        <div id="expireModal" class="modal">
+            <div class="modal-content">
+                <h3>Programar Expiración</h3>
+                <select id="modalExpiresIn">
+                    <option value="never">Nunca expira</option>
+                    <option value="1h">1 hora desde ahora</option>
+                    <option value="24h">24 horas desde ahora</option>
+                    <option value="7d">7 días desde ahora</option>
+                    <option value="30d">30 días desde ahora</option>
+                </select>
+                <div class="modal-actions">
+                    <button onclick="closeExpireModal()" style="background: var(--border); color: var(--text-dark);">Cancelar</button>
+                    <button onclick="updateExpiration()" style="background: var(--primary); color: white;">Guardar</button>
+                </div>
+            </div>
+        </div>
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-content h3 {
+            margin: 0 0 20px 0;
+        }
+
+        .modal-content select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
         }
 
         .url-original {
@@ -199,6 +339,7 @@
                 <h3>Total de Enlaces</h3>
                 <div class="value" id="totalUrls">0</div>
             </div>
+        let currentShortCode = null;
             <div class="stat-box">
                 <h3>Total de Clics</h3>
                 <div class="value" id="totalClicks">0</div>
@@ -274,18 +415,128 @@
                 const urlsHtml = urls.map(url => {
                     const date = new Date(url.created_at);
                     const shortUrl = window.location.origin + '/' + url.short_code;
+                    const now = new Date();
+                    const isExpired = url.expires_at && new Date(url.expires_at) < now;
+                    const isInactive = !url.is_active;
+                    
+                    let expireBadge = '';
+                    if (isInactive) {
+                        expireBadge = '<span class="expire-badge expired">🗑️ Eliminado</span>';
+                    } else if (isExpired) {
+                        expireBadge = '<span class="expire-badge expired">⏰ Expirado</span>';
+                    } else if (url.expires_at) {
+                        const expiresDate = new Date(url.expires_at);
+                        const timeLeft = Math.ceil((expiresDate - now) / (1000 * 60 * 60));
+                        if (timeLeft < 24) {
+                            expireBadge = `<span class="expire-badge">⏰ Expira en ${timeLeft}h</span>`;
+                        } else {
+                            const daysLeft = Math.ceil(timeLeft / 24);
+                            expireBadge = `<span class="expire-badge">⏰ Expira en ${daysLeft}d</span>`;
+                        }
+                    }
                     
                     return `
-                        <div class="url-item">
+                        <div class="url-item ${isExpired || isInactive ? 'expired' : ''}">
                             <div class="url-header">
-                                <div class="url-short">${shortUrl}</div>
+                                <div class="url-info">
+                                    <div class="url-short">${shortUrl}</div>
+                                    <div class="url-original">${url.original_url}</div>
+                                    <div class="url-date">Creado: ${date.toLocaleDateString('es-ES', { 
+                                        year: 'numeric', 
+                                        month: 'long', 
+                                        day: 'numeric' 
+                                    })}</div>
+                                    ${expireBadge}
+                                </div>
                                 <div class="url-clicks">${url.clicks} clics</div>
                             </div>
-                            <div class="url-original">${url.original_url}</div>
-                            <div class="url-date">Creado: ${date.toLocaleDateString('es-ES', { 
-                                year: 'numeric', 
-                                month: 'long', 
-                                day: 'numeric' 
+                            <div class="url-actions">
+                                <button class="action-btn btn-copy-url" onclick="copyUrl('${shortUrl}')">
+                                    📋 Copiar
+           Copiar URL
+        async function copyUrl(url) {
+            try {
+                await navigator.clipboard.writeText(url);
+                alert('✓ URL copiada al portapapeles');
+            } catch (error) {
+                prompt('Copiar URL:', url);
+            }
+        }
+
+        // Eliminar URL
+        async function deleteUrl(shortCode) {
+            if (!confirm('¿Estás seguro de que quieres eliminar este enlace?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/urls/${shortCode}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al eliminar');
+                }
+
+                alert('✓ Enlace eliminado exitosamente');
+                loadUrls();
+            } catch (error) {
+                alert('Error al eliminar el enlace');
+            }
+        }
+
+        // Abrir modal de expiración
+        function openExpireModal(shortCode) {
+            currentShortCode = shortCode;
+            document.getElementById('expireModal').classList.add('active');
+        }
+
+        // Cerrar modal
+        function closeExpireModal() {
+            currentShortCode = null;
+            document.getElementById('expireModal').classList.remove('active');
+        }
+
+        // Actualizar expiración
+        async function updateExpiration() {
+            const expiresIn = document.getElementById('modalExpiresIn').value;
+
+            try {
+                const response = await fetch(`/api/urls/${currentShortCode}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ expiresIn })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al actualizar');
+                }
+
+                alert('✓ Expiración actualizada exitosamente');
+                closeExpireModal();
+                loadUrls();
+            } catch (error) {
+                alert('Error al actualizar la expiración');
+            }
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('expireModal').addEventListener('click', (e) => {
+            if (e.target.id === 'expireModal') {
+                closeExpireModal();
+            }
+        });
+
+        //                      </button>
+                                ${!isInactive ? `
+                                    <button class="action-btn btn-expire" onclick="openExpireModal('${url.short_code}')">
+                                        ⏱️ Expiración
+                                    </button>
+                                    <button class="action-btn btn-delete" onclick="deleteUrl('${url.short_code}')">
+                                        🗑️ Eliminar
+                                    </button>
+                                ` : ''}
+                             day: 'numeric' 
                             })}</div>
                         </div>
                     `;

@@ -35,7 +35,9 @@ db.exec(`
     original_url TEXT NOT NULL,
     user_id INTEGER,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME,
     clicks INTEGER DEFAULT 0,
+    is_active INTEGER DEFAULT 1,
     FOREIGN KEY (user_id) REFERENCES users(id)
   )
 `);
@@ -161,7 +163,7 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
 
 // API: Acortar URL
 app.post('/api/shorten', authenticateToken, (req, res) => {
-  const { url } = req.body;
+  const { url, expiresIn } = req.body;
 
   // Validar URL
   if (!url || !validator.isURL(url, { require_protocol: true })) {
@@ -173,10 +175,30 @@ app.post('/api/shorten', authenticateToken, (req, res) => {
   try {
     const userId = req.user ? req.user.id : null;
     
+    // Calcular fecha de expiración si se especifica
+    let expiresAt = null;
+    if (expiresIn && userId) {
+      const now = new Date();
+      switch(expiresIn) {
+        case '1h':
+          expiresAt = new Date(now.getTime() + 60 * 60 * 1000).toISOString();
+          break;
+        case '24h':
+          expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+          break;
+        case '7d':
+          expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+          break;
+        case '30d':
+          expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+          break;
+      }
+    }
+    
     // Verificar si la URL ya existe para este usuario
     let existing;
     if (userId) {
-      existing = db.prepare('SELECT short_code FROM urls WHERE original_url = ? AND user_id = ?').get(url, userId);
+      existing = db.prepare('SELECT short_code FROM urls WHERE original_url = ? AND user_id = ? AND is_active = 1').get(url, userId);
     }
     
     if (existing) {
@@ -201,8 +223,8 @@ app.post('/api/shorten', authenticateToken, (req, res) => {
     } while (db.prepare('SELECT id FROM urls WHERE short_code = ?').get(shortCode));
 
     // Insertar en la base de datos
-    const insert = db.prepare('INSERT INTO urls (short_code, original_url, user_id) VALUES (?, ?, ?)');
-    insert.run(shortCode, url, userId);
+    const insert = db.prepare('INSERT INTO urls (short_code, original_url, user_id, expires_at) VALUES (?, ?, ?, ?)');
+    insert.run(shortCode, url, userId, expiresAt);
     
     res.json({
       shortUrl: `${req.protocol}://${req.get('host')}/${shortCode}`,
@@ -218,10 +240,74 @@ app.post('/api/shorten', authenticateToken, (req, res) => {
 // API: Obtener todas las URLs del usuario
 app.get('/api/my-urls', authenticateToken, requireAuth, (req, res) => {
   try {
-    const urls = db.prepare('SELECT short_code, original_url, clicks, created_at FROM urls WHERE user_id = ? ORDER BY created_at DESC').all(req.user.id);
+    const urls = db.prepare('SELECT id, short_code, original_url, clicks, created_at, expires_at, is_active FROM urls WHERE user_id = ? ORDER BY created_at DESC').all(req.user.id);
     res.json({ urls });
   } catch (error) {
     console.error('Error al obtener URLs');
+    res.status(500).json({ error: 'Error al procesar la solicitud' });
+  }
+});
+
+// API: Eliminar URL
+app.delete('/api/urls/:shortCode', authenticateToken, requireAuth, (req, res) => {
+  const { shortCode } = req.params;
+  
+  try {
+    // Verificar que el enlace pertenece al usuario
+    const url = db.prepare('SELECT id FROM urls WHERE short_code = ? AND user_id = ?').get(shortCode, req.user.id);
+    
+    if (!url) {
+      return res.status(404).json({ error: 'Enlace no encontrado' });
+    }
+    
+    // Marcar como inactivo en lugar de eliminar (para mantener estadísticas)
+    db.prepare('UPDATE urls SET is_active = 0 WHERE short_code = ? AND user_id = ?').run(shortCode, req.user.id);
+    
+    res.json({ message: 'Enlace eliminado exitosamente' });
+  } catch (error) {
+    console.error('Error al eliminar URL');
+    res.status(500).json({ error: 'Error al procesar la solicitud' });
+  }
+});
+
+// API: Actualizar expiración de URL
+app.patch('/api/urls/:shortCode', authenticateToken, requireAuth, (req, res) => {
+  const { shortCode } = req.params;
+  const { expiresIn } = req.body;
+  
+  try {
+    // Verificar que el enlace pertenece al usuario
+    const url = db.prepare('SELECT id FROM urls WHERE short_code = ? AND user_id = ?').get(shortCode, req.user.id);
+    
+    if (!url) {
+      return res.status(404).json({ error: 'Enlace no encontrado' });
+    }
+    
+    // Calcular nueva fecha de expiración
+    let expiresAt = null;
+    if (expiresIn && expiresIn !== 'never') {
+      const now = new Date();
+      switch(expiresIn) {
+        case '1h':
+          expiresAt = new Date(now.getTime() + 60 * 60 * 1000).toISOString();
+          break;
+        case '24h':
+          expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+          break;
+        case '7d':
+          expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+          break;
+        case '30d':
+          expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+          break;
+      }
+    }
+    
+    db.prepare('UPDATE urls SET expires_at = ? WHERE short_code = ? AND user_id = ?').run(expiresAt, shortCode, req.user.id);
+    
+    res.json({ message: 'Expiración actualizada exitosamente' });
+  } catch (error) {
+    console.error('Error al actualizar URL');
     res.status(500).json({ error: 'Error al procesar la solicitud' });
   }
 });
@@ -254,10 +340,22 @@ app.get('/:shortCode', (req, res) => {
   const { shortCode } = req.params;
 
   try {
-    const url = db.prepare('SELECT original_url FROM urls WHERE short_code = ?').get(shortCode);
+    const url = db.prepare('SELECT original_url, expires_at, is_active FROM urls WHERE short_code = ?').get(shortCode);
 
-    if (!url) {
+    if (!url || !url.is_active) {
       return res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+    }
+
+    // Verificar si el enlace ha expirado
+    if (url.expires_at) {
+      const now = new Date();
+      const expiresAt = new Date(url.expires_at);
+      
+      if (now > expiresAt) {
+        // Marcar como inactivo
+        db.prepare('UPDATE urls SET is_active = 0 WHERE short_code = ?').run(shortCode);
+        return res.status(410).sendFile(path.join(__dirname, 'public', 'expired.html'));
+      }
     }
 
     // Incrementar contador de clics (sin guardar ninguna información del visitante)

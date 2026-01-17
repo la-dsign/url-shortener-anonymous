@@ -17,6 +17,9 @@ async function checkAuth() {
             const authLink = document.getElementById('authLink');
             authLink.href = '/dashboard.html';
             authLink.textContent = 'Mi Panel';
+            
+            // Mostrar opciones de expiración si está autenticado
+            document.getElementById('expirationOptions').style.display = 'block';
         }
     } catch (error) {
         // Usuario no autenticado, mostrar "Iniciar Sesión"
@@ -46,12 +49,14 @@ shortenBtn.addEventListener('click', async () => {
     }
 
     // Mostrar estado de carga
-    setLoading(true);
-
-    try {
+    setLoadingexpiresIn = document.getElementById('expiresIn')?.value || '';
+        
         const response = await fetch('/api/shorten', {
             method: 'POST',
             headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url, expiresIn
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ url })
