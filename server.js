@@ -232,8 +232,8 @@ app.post('/api/shorten', authenticateToken, (req, res) => {
     });
   } catch (error) {
     // Log de error sin información del usuario
-    console.error('Error al acortar URL');
-    res.status(500).json({ error: 'Error al procesar la solicitud' });
+    console.error('Error al acortar URL:', error.message);
+    res.status(500).json({ error: 'Error al procesar la solicitud: ' + error.message });
   }
 });
 
