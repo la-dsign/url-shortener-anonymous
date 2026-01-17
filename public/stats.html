@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas - ShortLink</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .stats-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-item {
+            padding: 20px;
+            background: var(--bg-light);
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            font-weight: 700;
+            word-break: break-all;
+        }
+
+        .stat-value.url {
+            font-family: 'Courier New', monospace;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .stat-value.clicks {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 30px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .back-link:hover {
+            transform: translateX(-4px);
+        }
+
+        .error-box {
+            background: #fef2f2;
+            border: 2px solid #fecaca;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            color: var(--error);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Volver al inicio
+        </a>
+
+        <div class="stats-card">
+            <h2 style="margin-bottom: 24px; color: var(--text-dark);">
+                📊 Estadísticas del Enlace
+            </h2>
+
+            <div id="loading" class="loading">
+                <svg class="spinner" viewBox="0 0 50 50" style="width: 40px; height: 40px; margin: 0 auto;">
+                    <circle cx="25" cy="25" r="20" fill="none" stroke="#667eea" stroke-width="5"></circle>
+                </svg>
+                <p style="margin-top: 16px;">Cargando estadísticas...</p>
+            </div>
+
+            <div id="stats" style="display: none;">
+                <div class="stat-item">
+                    <div class="stat-label">URL Original</div>
+                    <div class="stat-value url" id="originalUrl"></div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-label">Total de Clics</div>
+                    <div class="stat-value clicks" id="clicks"></div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-label">Fecha de Creación</div>
+                    <div class="stat-value" id="createdAt"></div>
+                </div>
+            </div>
+
+            <div id="error" class="error-box" style="display: none;">
+                <h3 style="margin-bottom: 12px;">⚠️ Enlace no encontrado</h3>
+                <p>El código de enlace no existe o ha expirado.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Obtener código de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const shortCode = urlParams.get('code');
+
+        if (!shortCode) {
+            showError();
+        } else {
+            loadStats(shortCode);
+        }
+
+        async function loadStats(code) {
+            try {
+                const response = await fetch(`/api/stats/${code}`);
+                
+                if (!response.ok) {
+                    throw new Error('No encontrado');
+                }
+
+                const data = await response.json();
+
+                // Mostrar estadísticas
+                document.getElementById('originalUrl').textContent = data.originalUrl;
+                document.getElementById('clicks').textContent = data.clicks.toLocaleString();
+                
+                // Formatear fecha
+                const date = new Date(data.createdAt);
+                document.getElementById('createdAt').textContent = date.toLocaleString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('stats').style.display = 'block';
+
+            } catch (error) {
+                showError();
+            }
+        }
+
+        function showError() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

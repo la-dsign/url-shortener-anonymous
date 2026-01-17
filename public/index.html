@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acortador de URLs - Rápido y Anónimo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <path d="M20 5L35 15V25L20 35L5 25V15L20 5Z" stroke="#667eea" stroke-width="2" fill="#667eea" opacity="0.2"/>
+                    <path d="M20 15L28 20L20 25L12 20L20 15Z" fill="#667eea"/>
+                </svg>
+                <h1>ShortLink</h1>
+            </div>
+            <p class="tagline">Acorta tus enlaces de forma profesional y anónima</p>
+        </header>
+
+        <main>
+            <div class="card">
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="urlInput" 
+                        placeholder="Ingresa tu URL aquí (ej: https://ejemplo.com/pagina-muy-larga)"
+                        autocomplete="off"
+                    >
+                    <button id="shortenBtn" class="btn-primary">
+                        <span class="btn-text">Acortar</span>
+                        <span class="btn-loading" style="display: none;">
+                            <svg class="spinner" viewBox="0 0 50 50">
+                                <circle cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+
+                <div id="error" class="error-message" style="display: none;"></div>
+
+                <div id="result" class="result" style="display: none;">
+                    <div class="result-header">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="#10b981">
+                            <path d="M10 0C4.486 0 0 4.486 0 10s4.486 10 10 10 10-4.486 10-10S15.514 0 10 0zm5.707 7.707l-7 7a1 1 0 01-1.414 0l-3-3a1 1 0 111.414-1.414L8 12.586l6.293-6.293a1 1 0 011.414 1.414z"/>
+                        </svg>
+                        <span>¡URL acortada exitosamente!</span>
+                    </div>
+                    
+                    <div class="url-box">
+                        <input type="text" id="shortUrl" readonly>
+                        <button id="copyBtn" class="btn-copy" title="Copiar">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            <span class="copy-text">Copiar</span>
+                        </button>
+                    </div>
+
+                    <div class="stats-link">
+                        <a id="statsLink" href="#" target="_blank">Ver estadísticas ›</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Totalmente Anónimo</h3>
+                    <p>No requiere registro ni información personal</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Rápido y Seguro</h3>
+                    <p>Acorta URLs instantáneamente con códigos únicos</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <h3>Estadísticas Básicas</h3>
+                    <p>Consulta cuántas veces se ha usado tu enlace</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Servicio gratuito y anónimo • Sin almacenamiento de datos personales</p>
+            <p style="margin-top: 8px; font-size: 0.85rem;">
+                <a href="/PRIVACY.md" target="_blank" style="color: rgba(255, 255, 255, 0.9); text-decoration: underline;">
+                    Política de Privacidad
+                </a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
