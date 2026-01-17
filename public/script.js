@@ -49,17 +49,17 @@ shortenBtn.addEventListener('click', async () => {
     }
 
     // Mostrar estado de carga
-    setLoadingexpiresIn = document.getElementById('expiresIn')?.value || '';
+    setLoading(true);
+
+    try {
+        const expiresIn = document.getElementById('expiresIn')?.value || '';
         
         const response = await fetch('/api/shorten', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ url, expiresIn
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ url })
+            body: JSON.stringify({ url, expiresIn })
         });
 
         const data = await response.json();
