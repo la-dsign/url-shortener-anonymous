@@ -8,6 +8,23 @@ const statsLink = document.getElementById('statsLink');
 const btnText = document.querySelector('.btn-text');
 const btnLoading = document.querySelector('.btn-loading');
 
+// Verificar si el usuario está autenticado
+async function checkAuth() {
+    try {
+        const response = await fetch('/api/auth/me');
+        if (response.ok) {
+            const data = await response.json();
+            const authLink = document.getElementById('authLink');
+            authLink.href = '/dashboard.html';
+            authLink.textContent = 'Mi Panel';
+        }
+    } catch (error) {
+        // Usuario no autenticado, mostrar "Iniciar Sesión"
+    }
+}
+
+checkAuth();
+
 // Acortar URL
 shortenBtn.addEventListener('click', async () => {
     const url = urlInput.value.trim();
